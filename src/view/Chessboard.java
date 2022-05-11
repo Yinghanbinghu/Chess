@@ -19,7 +19,7 @@ public class Chessboard extends JComponent {
      * <br>
      * chessListener：棋盘监听棋子的行动
      * <br>
-     * chessboard: 表示8 * 8的棋盘1
+     * chessboard: 表示8 * 8的棋盘
      * <br>
      * currentColor: 当前行棋方
      */

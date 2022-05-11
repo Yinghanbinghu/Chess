@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 /**
- * 这个类表示国际象棋里面的卒
+ * 这个类表示国际象棋里面的兵
  */
 public class PawnChessComponent extends ChessComponent {
     /**
