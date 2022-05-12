@@ -72,15 +72,14 @@ public class Chessboard extends JComponent {
             initKingOnBoard(CHESSBOARD_SIZE - 1, 4, ChessColor.WHITE);
         }
         if(model==2){
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < CHESSBOARD_SIZE; i++) {
                 initPawnOnBoard(CHESSBOARD_SIZE - 2, i, ChessColor.WHITE);
-
+                initPawnOnBoard(1, i, ChessColor.BLACK);
             }
-            initPawnOnBoard(1, 0, ChessColor.BLACK);
         }
         if(model==3){
-            initKingOnBoard(0, 4, ChessColor.BLACK);
-            initKingOnBoard(CHESSBOARD_SIZE - 1, 4, ChessColor.WHITE);
+            initQueenOnBoard(0, 3, ChessColor.BLACK);
+            initQueenOnBoard(CHESSBOARD_SIZE - 1, 3, ChessColor.WHITE);
         }
     }
 
@@ -121,13 +120,15 @@ public class Chessboard extends JComponent {
         add(passPawn=new EmptySlotComponent(passPawn.getChessboardPoint(),passPawn.getLocation(),clickController,CHESS_SIZE));
     }
 
-    public void upGratePawn(ChessComponent upGratePawn,int i){    //卒升变
+    public void upGratePawn(ChessComponent upGratePawn){    //卒升变
         remove(upGratePawn);
-        if(i==1){
+        Object[] obj2 ={ "后", "车", "马","相" };
+        String s = (String) JOptionPane.showInputDialog(null,"请选择你的升变类型:\n", "兵升变", JOptionPane.PLAIN_MESSAGE, new ImageIcon("icon.png"), obj2, "后");
+        if(s.equals("后")){
             add(new QueenChessComponent(upGratePawn.getChessboardPoint(),upGratePawn.getLocation(),upGratePawn.getChessColor(),clickController,CHESS_SIZE));
-        }else if(i==2){
+        }else if(s.equals("车")){
             add(new RookChessComponent(upGratePawn.getChessboardPoint(),upGratePawn.getLocation(),upGratePawn.getChessColor(),clickController,CHESS_SIZE));
-        }else if(i==3){
+        }else if(s.equals("马")){
             add(new KnightChessComponent(upGratePawn.getChessboardPoint(),upGratePawn.getLocation(),upGratePawn.getChessColor(),clickController,CHESS_SIZE));
         }else{
             add(new BishopChessComponent(upGratePawn.getChessboardPoint(),upGratePawn.getLocation(),upGratePawn.getChessColor(),clickController,CHESS_SIZE));

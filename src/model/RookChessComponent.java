@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * 这个类表示国际象棋里面的车
@@ -75,7 +76,13 @@ public class RookChessComponent extends ChessComponent {
 
     @Override
     public boolean canMoveTo(ChessComponent[][] chessComponents, ChessboardPoint destination,int step) {
-        ChessboardPoint source = getChessboardPoint();
+        ArrayList<ChessboardPoint> RookCanMove=ChessCanMove(chessComponents,step);
+        int row=destination.getX(),col=destination.getY();
+        for (ChessboardPoint TestChessboardPoint:RookCanMove) {
+            if( TestChessboardPoint.getX() == row && TestChessboardPoint.getY() == col)return true;
+        }
+        return false;
+        /*ChessboardPoint source = getChessboardPoint();
         if (source.getX() == destination.getX()) {
             int row = source.getX();
             for (int col = Math.min(source.getY(), destination.getY()) + 1;
@@ -95,7 +102,7 @@ public class RookChessComponent extends ChessComponent {
         } else { // Not on the same row or the same column.
             return false;
         }
-        return true;
+        return true;*/
     }
 
     /**
@@ -113,5 +120,64 @@ public class RookChessComponent extends ChessComponent {
             g.setColor(Color.RED);
             g.drawOval(0, 0, getWidth() , getHeight());
         }
+    }
+
+    public ArrayList<ChessboardPoint> ChessCanMove(ChessComponent[][] chessComponents,int step){
+        ArrayList<ChessboardPoint> RookCanMove = new ArrayList<>();
+        int col = this.getChessboardPoint().getY();
+        int row = this.getChessboardPoint().getX();
+        for (int i = row+1; i < 8; i++) {
+            if (chessComponents[i][col].getChessColor() == ChessColor.NONE) {
+                RookCanMove.add(new ChessboardPoint(i, col));
+            } else if (chessComponents[i][col].getChessColor() == ChessColor.WHITE && this.getChessColor() == ChessColor.BLACK) {
+                RookCanMove.add(new ChessboardPoint(i, col));
+                break;
+            } else if (chessComponents[i][col].getChessColor() == ChessColor.BLACK && this.getChessColor() == ChessColor.WHITE) {
+                RookCanMove.add(new ChessboardPoint(i, col));
+                break;
+            } else if (chessComponents[i][col].getChessColor() == this.getChessColor()) {
+                break;
+            }
+        }
+        for (int i = row-1; i >= 0; i--) {
+            if (chessComponents[i][col].getChessColor() == ChessColor.NONE) {
+                RookCanMove.add(new ChessboardPoint(i, col));
+            } else if (chessComponents[i][col].getChessColor() == ChessColor.WHITE && this.getChessColor() == ChessColor.BLACK) {
+                RookCanMove.add(new ChessboardPoint(i, col));
+                break;
+            } else if (chessComponents[i][col].getChessColor() == ChessColor.BLACK && this.getChessColor() == ChessColor.WHITE) {
+                RookCanMove.add(new ChessboardPoint(i, col));
+                break;
+            } else if (chessComponents[i][col].getChessColor() == this.getChessColor()) {
+                break;
+            }
+        }
+        for (int j = col-1; j >= 0; j--) {
+            if (chessComponents[row][j].getChessColor() == ChessColor.NONE) {
+                RookCanMove.add(new ChessboardPoint(row, j));
+            } else if (chessComponents[row][j].getChessColor() == ChessColor.WHITE && this.getChessColor() == ChessColor.BLACK) {
+                RookCanMove.add(new ChessboardPoint(row, j));
+                break;
+            } else if (chessComponents[row][j].getChessColor() == ChessColor.BLACK && this.getChessColor() == ChessColor.WHITE) {
+                RookCanMove.add(new ChessboardPoint(row, j));
+                break;
+            } else if (chessComponents[row][j].getChessColor() == this.getChessColor()) {
+                break;
+            }
+        }
+        for (int j = col+1; j < 8; j++) {
+            if (chessComponents[row][j].getChessColor() == ChessColor.NONE) {
+                RookCanMove.add(new ChessboardPoint(row, j));
+            } else if (chessComponents[row][j].getChessColor() == ChessColor.WHITE && this.getChessColor() == ChessColor.BLACK) {
+                RookCanMove.add(new ChessboardPoint(row, j));
+                break;
+            } else if (chessComponents[row][j].getChessColor() == ChessColor.BLACK && this.getChessColor() == ChessColor.WHITE) {
+                RookCanMove.add(new ChessboardPoint(row, j));
+                break;
+            } else if (chessComponents[row][j].getChessColor() == this.getChessColor()) {
+                break;
+            }
+        }
+        return RookCanMove;
     }
 }

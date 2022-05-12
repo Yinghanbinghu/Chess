@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * 这个类表示国际象棋里面的后
@@ -75,7 +76,13 @@ public class QueenChessComponent extends ChessComponent {
 
     @Override
     public boolean canMoveTo(ChessComponent[][] chessComponents, ChessboardPoint destination,int step) {
-        ChessboardPoint source = getChessboardPoint();
+        ArrayList<ChessboardPoint> QueenCanMove=ChessCanMove(chessComponents,step);
+        int row=destination.getX(),col=destination.getY();
+        for (ChessboardPoint TestChessboardPoint:QueenCanMove) {
+            if( TestChessboardPoint.getX() == row && TestChessboardPoint.getY() == col)return true;
+        }
+        return false;
+        /*ChessboardPoint source = getChessboardPoint();
         if (source.getX() == destination.getX()) {
             int row = source.getX();
             for (int col = Math.min(source.getY(), destination.getY()) + 1;
@@ -110,7 +117,7 @@ public class QueenChessComponent extends ChessComponent {
         else { // Not on the same line.
             return false;
         }
-        return true;
+        return true;*/
     }
 
     /**
@@ -128,5 +135,117 @@ public class QueenChessComponent extends ChessComponent {
             g.setColor(Color.RED);
             g.drawOval(0, 0, getWidth() , getHeight());
         }
+    }
+
+    public ArrayList<ChessboardPoint> ChessCanMove(ChessComponent[][] chessComponents,int step){
+        ArrayList<ChessboardPoint> QueenCanMove = new ArrayList<>();
+        int col = this.getChessboardPoint().getY();
+        int row = this.getChessboardPoint().getX();
+        for (int i = row+1; i < 8; i++) {
+            if (chessComponents[i][col].getChessColor() == ChessColor.NONE) {
+                QueenCanMove.add(new ChessboardPoint(i, col));
+            } else if (chessComponents[i][col].getChessColor() == ChessColor.WHITE && this.getChessColor() == ChessColor.BLACK) {
+                QueenCanMove.add(new ChessboardPoint(i, col));
+                break;
+            } else if (chessComponents[i][col].getChessColor() == ChessColor.BLACK && this.getChessColor() == ChessColor.WHITE) {
+                QueenCanMove.add(new ChessboardPoint(i, col));
+                break;
+            } else if (chessComponents[i][col].getChessColor() == this.getChessColor()) {
+                break;
+            }
+        }
+        for (int i = row-1; i >= 0; i--) {
+            if (chessComponents[i][col].getChessColor() == ChessColor.NONE) {
+                QueenCanMove.add(new ChessboardPoint(i, col));
+            } else if (chessComponents[i][col].getChessColor() == ChessColor.WHITE && this.getChessColor() == ChessColor.BLACK) {
+                QueenCanMove.add(new ChessboardPoint(i, col));
+                break;
+            } else if (chessComponents[i][col].getChessColor() == ChessColor.BLACK && this.getChessColor() == ChessColor.WHITE) {
+                QueenCanMove.add(new ChessboardPoint(i, col));
+                break;
+            } else if (chessComponents[i][col].getChessColor() == this.getChessColor()) {
+                break;
+            }
+        }
+        for (int j = col-1; j >= 0; j--) {
+            if (chessComponents[row][j].getChessColor() == ChessColor.NONE) {
+                QueenCanMove.add(new ChessboardPoint(row, j));
+            } else if (chessComponents[row][j].getChessColor() == ChessColor.WHITE && this.getChessColor() == ChessColor.BLACK) {
+                QueenCanMove.add(new ChessboardPoint(row, j));
+                break;
+            } else if (chessComponents[row][j].getChessColor() == ChessColor.BLACK && this.getChessColor() == ChessColor.WHITE) {
+                QueenCanMove.add(new ChessboardPoint(row, j));
+                break;
+            } else if (chessComponents[row][j].getChessColor() == this.getChessColor()) {
+                break;
+            }
+        }
+        for (int j = col+1; j < 8; j++) {
+            if (chessComponents[row][j].getChessColor() == ChessColor.NONE) {
+                QueenCanMove.add(new ChessboardPoint(row, j));
+            } else if (chessComponents[row][j].getChessColor() == ChessColor.WHITE && this.getChessColor() == ChessColor.BLACK) {
+                QueenCanMove.add(new ChessboardPoint(row, j));
+                break;
+            } else if (chessComponents[row][j].getChessColor() == ChessColor.BLACK && this.getChessColor() == ChessColor.WHITE) {
+                QueenCanMove.add(new ChessboardPoint(row, j));
+                break;
+            } else if (chessComponents[row][j].getChessColor() == this.getChessColor()) {
+                break;
+            }
+        }
+
+        for (int i = row-1, j = col+1; i >= 0 && j < 8; i--, j++) {
+            if (chessComponents[i][j].getChessColor() == ChessColor.NONE) {
+                QueenCanMove.add(new ChessboardPoint(i, j));
+            } else if (chessComponents[i][j].getChessColor() == ChessColor.WHITE && this.getChessColor() == ChessColor.BLACK) {
+                QueenCanMove.add(new ChessboardPoint(i, j));
+                break;
+            } else if (chessComponents[i][j].getChessColor() == ChessColor.BLACK && this.getChessColor() == ChessColor.WHITE) {
+                QueenCanMove.add(new ChessboardPoint(i, j));
+                break;
+            } else if (chessComponents[i][j].getChessColor() == this.getChessColor()) {
+                break;
+            }
+        }
+        for (int i = row+1, j = col-1; j >= 0 && i < 8; j--, i++) {
+            if (chessComponents[i][j].getChessColor() == ChessColor.NONE) {
+                QueenCanMove.add(new ChessboardPoint(i, j));
+            } else if (chessComponents[i][j].getChessColor() == ChessColor.WHITE && this.getChessColor() == ChessColor.BLACK) {
+                QueenCanMove.add(new ChessboardPoint(i, j));
+                break;
+            } else if (chessComponents[i][j].getChessColor() == ChessColor.BLACK && this.getChessColor() == ChessColor.WHITE) {
+                QueenCanMove.add(new ChessboardPoint(i, j));
+                break;
+            } else if (chessComponents[i][j].getChessColor() == this.getChessColor()) {
+                break;
+            }
+        }
+        for (int i = row+1, j = col+1; i <8&&j<8; i++, j++) {
+            if(chessComponents[i][j].getChessColor()==ChessColor.NONE){
+                QueenCanMove.add(new ChessboardPoint(i, j));}
+            else if (chessComponents[i][j].getChessColor()==ChessColor.WHITE&&this.getChessColor()==ChessColor.BLACK){
+                QueenCanMove.add(new ChessboardPoint(i, j));
+                break;
+            }else if (chessComponents[i][j].getChessColor()==ChessColor.BLACK&&this.getChessColor()==ChessColor.WHITE){
+                QueenCanMove.add(new ChessboardPoint(i, j));
+                break;
+            }else if(chessComponents[i][j].getChessColor()==this.getChessColor()){
+                break;
+            }
+        }
+        for (int i = row-1, j = col-1; i >=0&&j>=0; i--, j--) {
+            if(chessComponents[i][j].getChessColor()==ChessColor.NONE){
+                QueenCanMove.add(new ChessboardPoint(i, j));}
+            else if (chessComponents[i][j].getChessColor()==ChessColor.WHITE&&this.getChessColor()==ChessColor.BLACK){
+                QueenCanMove.add(new ChessboardPoint(i, j));
+                break;
+            }else if (chessComponents[i][j].getChessColor()==ChessColor.BLACK&&this.getChessColor()==ChessColor.WHITE){
+                QueenCanMove.add(new ChessboardPoint(i, j));
+                break;
+            }else if(chessComponents[i][j].getChessColor()==this.getChessColor()){
+                break;
+            }
+        }
+        return QueenCanMove;
     }
 }

@@ -4,8 +4,7 @@ import controller.GameController;
 
 import javax.swing.*;
 import java.awt.*;
-
-import java.util.Timer;
+import java.awt.event.WindowEvent;
 
 /**
  * 这个类表示游戏过程中的整个游戏界面，是一切的载体
@@ -99,5 +98,25 @@ public class ChessGameFrame extends JFrame {
             gameController.loadGameFromFile(path);
         });
     }
-
 }
+
+
+/*class PawnUpGrate extends JFrame{
+    private final int WIDTH;
+    private final int HEIGTH;
+
+    PawnUpGrate(int width, int heigth) {
+        WIDTH = width;
+        HEIGTH = heigth;
+        setSize(WIDTH, HEIGTH);
+    }
+    private void addNewGameButton() {
+        JButton button = new JButton("New Game");
+        *//*button.addActionListener((e) -> addChessboard());*//*
+        button.setLocation(HEIGTH, HEIGTH / 10 + 360);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(button);
+    }
+}*/
+

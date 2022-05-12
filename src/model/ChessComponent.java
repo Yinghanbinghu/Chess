@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * 这个类是一个抽象类，主要表示8*8棋盘上每个格子的棋子情况，当前有两个子类继承它，分别是EmptySlotComponent(空棋子)和RookChessComponent(车)。
@@ -70,6 +71,7 @@ public abstract class ChessComponent extends JComponent {
     public ChessboardPoint getChessboardPoint() {
         return chessboardPoint;
     }
+    public abstract ArrayList<ChessboardPoint> ChessCanMove(ChessComponent[][] chessComponents,int step);
 
     public void setChessboardPoint(ChessboardPoint chessboardPoint) { this.chessboardPoint = chessboardPoint; }
 

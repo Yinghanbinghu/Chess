@@ -7,10 +7,10 @@ import view.Chessboard;
 public class ClickController {
     private final Chessboard chessboard;
     private ChessComponent first;
-    private int UpGratePawn;
+    private boolean UpGratePawn;
 
     public void setUpGratePawn(int upGratePawn) {
-        UpGratePawn = upGratePawn;
+        UpGratePawn = true;
     }
 
     public ClickController(Chessboard chessboard) {
@@ -35,9 +35,9 @@ public class ClickController {
                 chessboard.swapChessComponents(first, chessComponent);
                 chessboard.swapColor();
                 chessboard.stepCount(true);
-                if(UpGratePawn!=0){
-                    chessboard.upGratePawn(first,UpGratePawn);
-                    UpGratePawn=0;
+                if(UpGratePawn){
+                    chessboard.upGratePawn(first);
+                    UpGratePawn=false;
                 }
                 first.setSelected(false);
                 first = null;

@@ -1,6 +1,5 @@
 package model;
 
-import view.Chessboard;
 import view.ChessboardPoint;
 import controller.ClickController;
 
@@ -8,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * 这个类表示国际象棋里面的王
@@ -69,8 +69,14 @@ public class KingChessComponent extends ChessComponent {
     }*/
     @Override
     public boolean canMoveTo(ChessComponent[][] chessComponents, ChessboardPoint destination,int step) {
-        ChessboardPoint source = getChessboardPoint();
-        if (Math.abs(destination.getX()-this.getChessboardPoint().getX())<=1&&Math.abs(destination.getY()-this.getChessboardPoint().getY())<=1) {/*(source.getX() == destination.getX() && (source.getY() == destination.getY() + 1 || source.getY() == destination.getY() - 1)) || (destination.getY() == source.getY() && (source.getX() == destination.getX() + 1 || source.getX() == destination.getX() - 1))*/
+        ArrayList<ChessboardPoint> KingCanMove=ChessCanMove(chessComponents,step);
+        int row=destination.getX(),col=destination.getY();
+        for (ChessboardPoint TestChessboardPoint:KingCanMove) {
+            if( TestChessboardPoint.getX() == row && TestChessboardPoint.getY() == col)return true;
+        }
+        return false;
+        /*ChessboardPoint source = getChessboardPoint();
+        if (Math.abs(destination.getX()-this.getChessboardPoint().getX())<=1&&Math.abs(destination.getY()-this.getChessboardPoint().getY())<=1) {*//*(source.getX() == destination.getX() && (source.getY() == destination.getY() + 1 || source.getY() == destination.getY() - 1)) || (destination.getY() == source.getY() && (source.getX() == destination.getX() + 1 || source.getX() == destination.getX() - 1))*//*
             int row = destination.getX(), col = destination.getY();
             int i,j;
             i=row-1;j=col;
@@ -90,7 +96,7 @@ public class KingChessComponent extends ChessComponent {
             i=row+1;j=col+1;
             if(i<8&&i>=0&&j<8&&j>=0&&chessComponents[i][j] instanceof KingChessComponent&&chessComponents[i][j].getChessColor()!=this.getChessColor()) return false;
             return true;
-        }else return false;
+        }else return false;*/
     }
 
     /**
@@ -108,5 +114,48 @@ public class KingChessComponent extends ChessComponent {
             g.setColor(Color.RED);
             g.drawOval(0, 0, getWidth(), getHeight());
         }
+    }
+
+    public ArrayList<ChessboardPoint> ChessCanMove(ChessComponent[][] chessComponents,int step){
+        ArrayList<ChessboardPoint> KingCanMove=new ArrayList<>();
+        int row=this.getChessboardPoint().getX(),col=this.getChessboardPoint().getY();
+        int i,j;
+        i=row-1;j=col;
+        if (i>=0&&i<8&&j>=0&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor()&&KingMeet(chessComponents,i,j)) KingCanMove.add(new ChessboardPoint(i,j));
+        i=row-1;j=col-1;
+        if (i>=0&&i<8&&j>=0&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor()&&KingMeet(chessComponents,i,j)) KingCanMove.add(new ChessboardPoint(i,j));
+        i=row-1;j=col+1;
+        if (i>=0&&i<8&&j>=0&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor()&&KingMeet(chessComponents,i,j)) KingCanMove.add(new ChessboardPoint(i,j));
+        i=row;j=col+1;
+        if (i>=0&&i<8&&j>=0&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor()&&KingMeet(chessComponents,i,j)) KingCanMove.add(new ChessboardPoint(i,j));
+        i=row;j=col-1;
+        if (i>=0&&i<8&&j>=0&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor()&&KingMeet(chessComponents,i,j)) KingCanMove.add(new ChessboardPoint(i,j));
+        i=row+1;j=col+1;
+        if (i>=0&&i<8&&j>=0&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor()&&KingMeet(chessComponents,i,j)) KingCanMove.add(new ChessboardPoint(i,j));
+        i=row+1;j=col-1;
+        if (i>=0&&i<8&&j>=0&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor()&&KingMeet(chessComponents,i,j)) KingCanMove.add(new ChessboardPoint(i,j));
+        i=row+1;j=col;
+        if (i>=0&&i<8&&j>=0&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor()&&KingMeet(chessComponents,i,j)) KingCanMove.add(new ChessboardPoint(i,j));
+        return KingCanMove;
+    }
+    private boolean KingMeet(ChessComponent[][] chessComponents,int row,int col){
+        int i,j;
+        i=row-1;j=col;
+        if(i<8&&i>=0&&j<8&&j>=0&&chessComponents[i][j] instanceof KingChessComponent&&chessComponents[i][j].getChessColor()!=this.getChessColor()) return false;
+        i=row-1;j=col+1;
+        if(i<8&&i>=0&&j<8&&j>=0&&chessComponents[i][j] instanceof KingChessComponent&&chessComponents[i][j].getChessColor()!=this.getChessColor()) return false;
+        i=row-1;j=col-1;
+        if(i<8&&i>=0&&j<8&&j>=0&&chessComponents[i][j] instanceof KingChessComponent&&chessComponents[i][j].getChessColor()!=this.getChessColor()) return false;
+        i=row;j=col+1;
+        if(i<8&&i>=0&&j<8&&j>=0&&chessComponents[i][j] instanceof KingChessComponent&&chessComponents[i][j].getChessColor()!=this.getChessColor()) return false;
+        i=row;j=col-1;
+        if(i<8&&i>=0&&j<8&&j>=0&&chessComponents[i][j] instanceof KingChessComponent&&chessComponents[i][j].getChessColor()!=this.getChessColor()) return false;
+        i=row+1;j=col;
+        if(i<8&&i>=0&&j<8&&j>=0&&chessComponents[i][j] instanceof KingChessComponent&&chessComponents[i][j].getChessColor()!=this.getChessColor()) return false;
+        i=row+1;j=col-1;
+        if(i<8&&i>=0&&j<8&&j>=0&&chessComponents[i][j] instanceof KingChessComponent&&chessComponents[i][j].getChessColor()!=this.getChessColor()) return false;
+        i=row+1;j=col+1;
+        if(i<8&&i>=0&&j<8&&j>=0&&chessComponents[i][j] instanceof KingChessComponent&&chessComponents[i][j].getChessColor()!=this.getChessColor()) return false;
+        return true;
     }
 }
