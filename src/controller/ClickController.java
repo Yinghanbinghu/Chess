@@ -29,6 +29,9 @@ public class ClickController {
             if (handleFirst(chessComponent)) {
                 chessComponent.setSelected(true);
                 first = chessComponent;
+                if (chessboard.isIfHelp()){
+                    chessboard.helpCanMoveTo(first);
+                }
                 first.repaint();
             }
         } else {
@@ -36,12 +39,14 @@ public class ClickController {
                 chessComponent.setSelected(false);
                 ChessComponent recordFirst = first;
                 first = null;
+                chessboard.helpCanMoveTo(null);
                 recordFirst.repaint();
             } else if (handleSecond(chessComponent)) {
                 //repaint in swap chess method.
                 chessboard.swapChessComponents(first, chessComponent);
                 chessboard.swapColor();
                 chessboard.stepCount(true);
+                chessboard.helpCanMoveTo(null);
                 if(UpGratePawn){
                     chessboard.upGratePawn(first);
                     UpGratePawn=false;

@@ -24,6 +24,7 @@ public abstract class ChessComponent extends JComponent {
 
 //    private static final Dimension CHESSGRID_SIZE = new Dimension(1080 / 4 * 3 / 8, 1080 / 4 * 3 / 8);
     private static final Color[] BACKGROUND_COLORS = {Color.WHITE, Color.BLACK};
+    private static final Color[] CHOOSE_BACKGROUND_COLORS = {Color.GRAY, Color.YELLOW};
     /**
      * handle click event
      */
@@ -43,6 +44,11 @@ public abstract class ChessComponent extends JComponent {
 
     private int twoStep=0;                   //计算可吃过路兵的step
 
+    private boolean ifCanMoveOn=false;
+
+    public void setIfCanMoveOn(boolean ifCanMoveOn) {
+        this.ifCanMoveOn = ifCanMoveOn;
+    }
 
     public String getChessName() {
         return name;
@@ -81,6 +87,7 @@ public abstract class ChessComponent extends JComponent {
     public ChessboardPoint getChessboardPoint() {
         return chessboardPoint;
     }
+
     public abstract ArrayList<ChessboardPoint> ChessCanMove(ChessComponent[][] chessComponents,int step);
 
     public void setChessboardPoint(ChessboardPoint chessboardPoint) { this.chessboardPoint = chessboardPoint; }
@@ -142,8 +149,10 @@ public abstract class ChessComponent extends JComponent {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponents(g);
+        Color squareColor;
         System.out.printf("repaint chess [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
-        Color squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];
+        if(ifCanMoveOn){squareColor = CHOOSE_BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];}
+        else {squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];}
         g.setColor(squareColor);
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
     }

@@ -7,6 +7,7 @@ import controller.ClickController;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class Chessboard extends JComponent {
      * currentColor: 当前行棋方
      */
     private static final int CHESSBOARD_SIZE = 8;
-    private static int model = 3;
+    private static int model = 1;
 
     private final ChessComponent[][] chessComponents = new ChessComponent[CHESSBOARD_SIZE][CHESSBOARD_SIZE];
     private ChessColor currentColor = ChessColor.WHITE;
@@ -36,6 +37,7 @@ public class Chessboard extends JComponent {
     private final int CHESS_SIZE;
     private int stepNum = 1;      //步数计算
     private Map<Integer, StringBuilder> map = new HashMap<>();
+    private ArrayList<ChessboardPoint> currentCanMovePoint=null;
 
     private boolean ifHelp = true;
 
@@ -51,6 +53,24 @@ public class Chessboard extends JComponent {
         if (b) {
             stepNum++;
         } else stepNum--;
+    }
+
+
+    public void helpCanMoveTo(ChessComponent first){          //显示移动位置
+        if(first==null){
+            currentCanMovePoint=null;
+        }else currentCanMovePoint=first.ChessCanMove(chessComponents,stepNum);
+        for (ChessComponent[] i:chessComponents) {
+            for (ChessComponent j:i ) {
+                j.setIfCanMoveOn(false);
+            }
+        }
+        if (currentCanMovePoint!=null) {
+            for (ChessboardPoint i : currentCanMovePoint) {
+                chessComponents[i.getX()][i.getY()].setIfCanMoveOn(true);
+            }
+        }
+        repaint();
     }
 
     public int getStepNum() {
@@ -323,7 +343,7 @@ public class Chessboard extends JComponent {
             map1 = (Map<Integer, StringBuilder>) ois.readObject();
             System.out.println(map1);
         } catch (Exception e) {
-            System.out.println("文件被修改");
+            JOptionPane.showMessageDialog(null, "文件有改动", "提示",JOptionPane.WARNING_MESSAGE);
             return false;
         }
         StringBuilder sb = new StringBuilder();
@@ -333,21 +353,21 @@ public class Chessboard extends JComponent {
         for (; I <= endStep; I++) {
             System.out.println(I);
             if (!map1.containsKey(I)) {
-                System.out.println("有非法移动");
+                JOptionPane.showMessageDialog(null, "含非法移动", "提示",JOptionPane.WARNING_MESSAGE);
                 return false;
             } else {
                 sb = map1.get(I);
                 System.out.println(sb);
                 if (sb.length() != 81) {
-                    System.out.println("棋盘大小非法");
+                    JOptionPane.showMessageDialog(null, "棋盘大小非法", "提示",JOptionPane.WARNING_MESSAGE);
                     return false;
                 }
                 if (sb.charAt(0) != 'w' && sb.charAt(0) != 'b') {
-                    System.out.println("没有当前玩家");
+                    JOptionPane.showMessageDialog(null, "没有当前玩家", "提示",JOptionPane.WARNING_MESSAGE);
                     return false;
                 }
                 if (sb.charAt(1) != '\n') {
-                    System.out.println("格式错误");
+                    JOptionPane.showMessageDialog(null, "格式错误", "提示",JOptionPane.WARNING_MESSAGE);
                     return false;
                 }
                 char[] chessGroup = {'B', 'K', 'N', 'P', 'Q', 'R', '_', 'b', 'k', 'n', 'p', 'q', 'r'};
@@ -358,17 +378,17 @@ public class Chessboard extends JComponent {
                             if (k == sb.charAt(j)) ifIsChess = true;
                         }
                         if (!ifIsChess) {
-                            System.out.println("含非法棋子");
+                            JOptionPane.showMessageDialog(null, "棋子错误", "提示",JOptionPane.WARNING_MESSAGE);
                             return false;
                         }
                     }
                     if (sb.charAt(i * 9 + 1) != '\n') {
-                        System.out.println("格式错误");
+                        JOptionPane.showMessageDialog(null, "格式错误", "提示",JOptionPane.WARNING_MESSAGE);
                         return false;
                     }
                 }
                 if (!(sb.charAt(74) == 'S' && sb.charAt(75) == 't' && sb.charAt(76) == 'e' && sb.charAt(77) == 'p' && sb.charAt(78) == ':')) {
-                    System.out.println("格式错误");
+                    JOptionPane.showMessageDialog(null, "格式错误", "提示",JOptionPane.WARNING_MESSAGE);
                     return false;
                 }
             }
