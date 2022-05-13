@@ -43,6 +43,8 @@ public class BishopChessComponent extends ChessComponent {
     public BishopChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size) {
         super(chessboardPoint, location, color, listener, size);
         initiateBishopImage(color);
+        if(this.getChessColor()==ChessColor.WHITE) super.setChessName("b");
+        else super.setChessName("B");
     }
 
     /**

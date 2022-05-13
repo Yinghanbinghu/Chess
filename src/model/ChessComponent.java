@@ -39,8 +39,18 @@ public abstract class ChessComponent extends JComponent {
     private ChessboardPoint chessboardPoint;
     protected final ChessColor chessColor;
     private boolean selected;
+    private String name;
 
-    private int twoStep=0;                 //计算可吃过路兵的step
+    private int twoStep=0;                   //计算可吃过路兵的step
+
+
+    public String getChessName() {
+        return name;
+    }
+
+    public void setChessName(String name) {   //设置棋子名称
+        this.name=name;
+    }
 
     public int getTwoStep(){
         return twoStep;
@@ -107,7 +117,6 @@ public abstract class ChessComponent extends JComponent {
     @Override
     protected void processMouseEvent(MouseEvent e) {
         super.processMouseEvent(e);
-
         if (e.getID() == MouseEvent.MOUSE_PRESSED) {
             System.out.printf("Click [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
             clickController.onClick(this);
@@ -137,5 +146,13 @@ public abstract class ChessComponent extends JComponent {
         Color squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];
         g.setColor(squareColor);
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
+    }
+
+    public boolean canEatKing(int step, ChessComponent[][] chessComponents) {
+        for (ChessboardPoint i : this.ChessCanMove(chessComponents, step)) {
+            if (chessComponents[i.getX()][i.getY()] instanceof KingChessComponent)
+                return true;
+        }
+        return false;
     }
 }

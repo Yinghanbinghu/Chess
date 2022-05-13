@@ -14,6 +14,7 @@ public class EmptySlotComponent extends ChessComponent {
 
     public EmptySlotComponent(ChessboardPoint chessboardPoint, Point location, ClickController listener, int size) {
         super(chessboardPoint, location, ChessColor.NONE, listener, size);
+        super.setChessName("_");
     }
 
     @Override
@@ -30,3 +31,4 @@ public class EmptySlotComponent extends ChessComponent {
         return new ArrayList<>();
     }
 }
+

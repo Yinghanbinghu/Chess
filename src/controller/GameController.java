@@ -2,6 +2,7 @@ package controller;
 
 import view.Chessboard;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,15 +15,25 @@ public class GameController {
         this.chessboard = chessboard;
     }
 
-    public List<String> loadGameFromFile(String path) {
-        try {
-            List<String> chessData = Files.readAllLines(Path.of(path));
-            chessboard.loadGame(chessData);
-            return chessData;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public void setHelpModel(){
+        chessboard.setIfHelp();
+    }
+
+    public boolean loadGameFromFile(File f) {
+       return chessboard.loadGame(f);
+    }
+    public boolean getHelpModel(){
+        return chessboard.isIfHelp();
+    }
+    public void saveGame(){
+        chessboard.saveGame();
+    }
+    public void newGame(){
+        chessboard.initChessboard();
+        chessboard.repaint();
+    }
+    public void regret(){
+        chessboard.regret();
     }
 
 }

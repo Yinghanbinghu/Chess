@@ -64,6 +64,8 @@ public class KnightChessComponent extends ChessComponent {
     public KnightChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size) {
         super(chessboardPoint, location, color, listener, size);
         initiateKnightImage(color);
+        if(this.getChessColor()==ChessColor.WHITE) super.setChessName("n");
+        else super.setChessName("N");
     }
 
     /**

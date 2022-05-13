@@ -1,8 +1,11 @@
 package controller;
 
 
+import model.ChessColor;
 import model.ChessComponent;
 import view.Chessboard;
+
+import javax.swing.*;
 
 public class ClickController {
     private final Chessboard chessboard;
@@ -15,6 +18,10 @@ public class ClickController {
 
     public ClickController(Chessboard chessboard) {
         this.chessboard = chessboard;
+    }
+
+    public void intiFirst() {
+        this.first = null;
     }
 
     public void onClick(ChessComponent chessComponent) {
@@ -39,9 +46,23 @@ public class ClickController {
                     chessboard.upGratePawn(first);
                     UpGratePawn=false;
                 }
+                if(!chessboard.canMove()){
+                    int n = JOptionPane.showConfirmDialog(null, "是否开始新游戏?", "无子可动和棋",JOptionPane.YES_NO_OPTION);
+                    if(n==1){
+                        chessboard.initChessboard();
+                    }
+                }
+                if(chessboard.isIfHelp()&&chessboard.ifKingCanBeEat()){
+                    if(chessboard.getCurrentColor()== ChessColor.WHITE)
+                    JOptionPane.showMessageDialog(null, "黑方将军", "提示",JOptionPane.WARNING_MESSAGE);
+                    if(chessboard.getCurrentColor()== ChessColor.BLACK)
+                        JOptionPane.showMessageDialog(null, "白方将军", "提示",JOptionPane.WARNING_MESSAGE);
+                }
+                chessboard.saveStep();
                 first.setSelected(false);
                 first = null;
             }
+
         }
     }
 

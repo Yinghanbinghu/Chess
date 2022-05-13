@@ -5,6 +5,7 @@ import controller.GameController;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 /**
  * 这个类表示游戏过程中的整个游戏界面，是一切的载体
@@ -33,6 +34,9 @@ public class ChessGameFrame extends JFrame {
         addHelloButton();
         addLoadButton();
         addNewGameButton();
+        addHelpButton();
+        addSaveButton();
+        addRegretButton();
     }
 
 
@@ -70,7 +74,7 @@ public class ChessGameFrame extends JFrame {
     private void addHelloButton() {
         JButton button = new JButton("Show Hello Here");
         button.addActionListener((e) -> JOptionPane.showMessageDialog(this, "Hello, world!"));
-        button.setLocation(HEIGTH, HEIGTH / 10 + 120);
+        button.setLocation(HEIGTH, HEIGTH / 10 + 60);
         button.setSize(200, 60);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
         add(button);
@@ -78,8 +82,8 @@ public class ChessGameFrame extends JFrame {
 
     private void addNewGameButton() {
         JButton button = new JButton("New Game");
-        button.addActionListener((e) -> addChessboard());
-        button.setLocation(HEIGTH, HEIGTH / 10 + 360);
+        button.addActionListener((e) -> gameController.newGame());
+        button.setLocation(HEIGTH, HEIGTH / 10 + 120);
         button.setSize(200, 60);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
         add(button);
@@ -87,15 +91,60 @@ public class ChessGameFrame extends JFrame {
 
     private void addLoadButton() {
         JButton button = new JButton("Load");
-        button.setLocation(HEIGTH, HEIGTH / 10 + 240);
+        button.setLocation(HEIGTH, HEIGTH / 10 + 180);
         button.setSize(200, 60);
         button.setFont(new Font("Rockwell", Font.BOLD, 20));
         add(button);
 
         button.addActionListener(e -> {
             System.out.println("Click load");
-            String path = JOptionPane.showInputDialog(this,"Input Path here");
-            gameController.loadGameFromFile(path);
+            JFileChooser jfc=new JFileChooser(new File("./resource"));
+            jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            jfc.showDialog(new JLabel(),"选");
+            File file=jfc.getSelectedFile();
+            if(file.getName().endsWith(".txt")) {
+                gameController.loadGameFromFile(file);
+            }else {
+             JOptionPane.showMessageDialog(null,"格式错误","报错",JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+    private void addHelpButton(){
+        JButton button = new JButton("Help On");
+
+        button.addActionListener((e) ->{
+            gameController.setHelpModel();
+            if(gameController.getHelpModel()){button.setText("Help On");
+            }else button.setText("Help Off");
+        });
+
+        button.setLocation(HEIGTH, HEIGTH / 10 + 240);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(button);
+    }
+    private void addSaveButton() {
+        JButton button = new JButton("Save");
+        button.setLocation(HEIGTH, HEIGTH / 10 + 360);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(button);
+
+        button.addActionListener(e -> {
+            System.out.println("Click save");
+            gameController.saveGame();
+        });
+    }
+    private void addRegretButton() {
+        JButton button = new JButton("Regret");
+        button.setLocation(HEIGTH, HEIGTH / 10 + 300);
+        button.setSize(200, 60);
+        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        add(button);
+
+        button.addActionListener(e -> {
+            System.out.println("Click regret");
+            gameController.regret();
         });
     }
 }
@@ -109,14 +158,6 @@ public class ChessGameFrame extends JFrame {
         WIDTH = width;
         HEIGTH = heigth;
         setSize(WIDTH, HEIGTH);
-    }
-    private void addNewGameButton() {
-        JButton button = new JButton("New Game");
-        *//*button.addActionListener((e) -> addChessboard());*//*
-        button.setLocation(HEIGTH, HEIGTH / 10 + 360);
-        button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(button);
-    }
-}*/
+    }*/
+
 
