@@ -3,6 +3,7 @@ package controller;
 
 import model.ChessColor;
 import model.ChessComponent;
+import model.KingChessComponent;
 import view.Chessboard;
 
 import javax.swing.*;
@@ -42,6 +43,17 @@ public class ClickController {
                 chessboard.helpCanMoveTo(null);
                 recordFirst.repaint();
             } else if (handleSecond(chessComponent)) {
+                if(chessComponent instanceof KingChessComponent){
+                    int n;
+                    if(chessboard.getCurrentColor()==ChessColor.WHITE){
+                        n = JOptionPane.showConfirmDialog(null, "是否开始新游戏?", "白方获胜", JOptionPane.YES_NO_OPTION);
+                    }else {
+                        n = JOptionPane.showConfirmDialog(null, "是否开始新游戏?", "黑方获胜", JOptionPane.YES_NO_OPTION);
+                    }
+                    if(n==1) {
+                        chessboard.initChessboard();
+                    }
+                }
                 //repaint in swap chess method.
                 chessboard.swapChessComponents(first, chessComponent);
                 chessboard.swapColor();
@@ -57,17 +69,16 @@ public class ClickController {
                         chessboard.initChessboard();
                     }
                 }
+                chessboard.saveStep();
+                first.setSelected(false);
+                first = null;
                 if(chessboard.isIfHelp()&&chessboard.ifKingCanBeEat()){
                     if(chessboard.getCurrentColor()== ChessColor.WHITE)
                     JOptionPane.showMessageDialog(null, "黑方将军", "提示",JOptionPane.WARNING_MESSAGE);
                     if(chessboard.getCurrentColor()== ChessColor.BLACK)
                         JOptionPane.showMessageDialog(null, "白方将军", "提示",JOptionPane.WARNING_MESSAGE);
                 }
-                chessboard.saveStep();
-                first.setSelected(false);
-                first = null;
             }
-
         }
     }
 

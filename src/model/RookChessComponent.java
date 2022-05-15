@@ -64,6 +64,7 @@ public class RookChessComponent extends ChessComponent {
     public RookChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size) {
         super(chessboardPoint, location, color, listener, size);
         initiateRookImage(color);
+        super.setIntiPoint(chessboardPoint);
         if(this.getChessColor()==ChessColor.WHITE) super.setChessName("r");
         else super.setChessName("R");
     }

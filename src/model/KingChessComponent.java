@@ -55,6 +55,7 @@ public class KingChessComponent extends ChessComponent {
     public KingChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size) {
         super(chessboardPoint, location, color, listener, size);
         initiateQueenImage(color);
+        super.setIntiPoint(chessboardPoint);
         if(this.getChessColor()==ChessColor.WHITE) super.setChessName("k");
         else super.setChessName("K");
     }
@@ -117,6 +118,7 @@ public class KingChessComponent extends ChessComponent {
             g.drawOval(0, 0, getWidth(), getHeight());
         }
     }
+
 
     public ArrayList<ChessboardPoint> ChessCanMove(ChessComponent[][] chessComponents,int step){
         ArrayList<ChessboardPoint> KingCanMove=new ArrayList<>();

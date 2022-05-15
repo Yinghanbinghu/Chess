@@ -24,7 +24,8 @@ public abstract class ChessComponent extends JComponent {
 
 //    private static final Dimension CHESSGRID_SIZE = new Dimension(1080 / 4 * 3 / 8, 1080 / 4 * 3 / 8);
     private static final Color[] BACKGROUND_COLORS = {Color.WHITE, Color.BLACK};
-    private static final Color[] CHOOSE_BACKGROUND_COLORS = {Color.GRAY, Color.YELLOW};
+    private static final Color[] CHOOSE_BACKGROUND_COLORS = {Color.LIGHT_GRAY, Color.CYAN};
+    private static final Color[] EAT_KING_BACKGROUND_COLORS={Color.PINK,Color.RED};
     /**
      * handle click event
      */
@@ -41,10 +42,20 @@ public abstract class ChessComponent extends JComponent {
     protected final ChessColor chessColor;
     private boolean selected;
     private String name;
+    private ChessboardPoint intiPoint=null;
 
     private int twoStep=0;                   //计算可吃过路兵的step
 
     private boolean ifCanMoveOn=false;
+    private boolean ifCanEatKing=false;
+
+    public void setIntiPoint(ChessboardPoint intiPoint) {
+        this.intiPoint = intiPoint;
+    }
+
+    public void setIfCanEatKing(boolean ifCanEatKing) {
+        this.ifCanEatKing = ifCanEatKing;
+    }
 
     public void setIfCanMoveOn(boolean ifCanMoveOn) {
         this.ifCanMoveOn = ifCanMoveOn;
@@ -53,6 +64,7 @@ public abstract class ChessComponent extends JComponent {
     public String getChessName() {
         return name;
     }
+
 
     public void setChessName(String name) {   //设置棋子名称
         this.name=name;
@@ -152,6 +164,7 @@ public abstract class ChessComponent extends JComponent {
         Color squareColor;
         System.out.printf("repaint chess [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
         if(ifCanMoveOn){squareColor = CHOOSE_BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];}
+        else if(ifCanEatKing){squareColor = EAT_KING_BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];}
         else {squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];}
         g.setColor(squareColor);
         g.fillRect(0, 0, this.getWidth(), this.getHeight());

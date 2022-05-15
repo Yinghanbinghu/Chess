@@ -204,7 +204,7 @@ public class PawnChessComponent extends ChessComponent {
     public ArrayList<ChessboardPoint> EatPassPawn(ChessComponent[][] chessComponents, int step) {
         ArrayList<ChessboardPoint> EatPassPawn = new ArrayList<>();
         int row = this.getChessboardPoint().getX(), col = this.getChessboardPoint().getY();
-        if (col + 1 < 7 && chessComponents[row][col + 1] instanceof PawnChessComponent && chessComponents[row][col + 1].getChessColor() != this.getChessColor() && chessComponents[row][col + 1].getTwoStep() + 1 == step) {
+        if (col + 1 <=7 && chessComponents[row][col + 1] instanceof PawnChessComponent && chessComponents[row][col + 1].getChessColor() != this.getChessColor() && chessComponents[row][col + 1].getTwoStep() + 1 == step) {
             if (this.getChessColor() == ChessColor.BLACK) EatPassPawn.add(new ChessboardPoint(row + 1, col + 1));
             else if (this.getChessColor() == ChessColor.WHITE) EatPassPawn.add(new ChessboardPoint(row - 1, col + 1));
         }

@@ -13,6 +13,7 @@ public class GameController {
 
     public GameController(Chessboard chessboard) {
         this.chessboard = chessboard;
+
     }
 
     public void setHelpModel(){
@@ -34,6 +35,9 @@ public class GameController {
     }
     public void regret(){
         chessboard.regret();
+    }
+    public void playback(){
+        chessboard.playback();
     }
 
 }

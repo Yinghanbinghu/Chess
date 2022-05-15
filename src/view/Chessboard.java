@@ -1,6 +1,9 @@
 package view;
 
 
+import controller.AIController;
+import controller.GameController;
+import controller.TimeController;
 import model.*;
 import controller.ClickController;
 
@@ -37,7 +40,17 @@ public class Chessboard extends JComponent {
     private final int CHESS_SIZE;
     private int stepNum = 1;      //步数计算
     private Map<Integer, StringBuilder> map = new HashMap<>();
-    private ArrayList<ChessboardPoint> currentCanMovePoint=null;
+    private ArrayList<ChessboardPoint> currentCanMovePoint = null;
+    private AIController ai=new AIController(this);
+
+    public void randomMove(){
+        ai.setChessboard(this);
+        ai.random(currentColor);
+    }
+
+    public ClickController getClickController() {
+        return clickController;
+    }
 
     private boolean ifHelp = true;
 
@@ -56,16 +69,16 @@ public class Chessboard extends JComponent {
     }
 
 
-    public void helpCanMoveTo(ChessComponent first){          //显示移动位置
-        if(first==null){
-            currentCanMovePoint=null;
-        }else currentCanMovePoint=first.ChessCanMove(chessComponents,stepNum);
-        for (ChessComponent[] i:chessComponents) {
-            for (ChessComponent j:i ) {
+    public void helpCanMoveTo(ChessComponent first) {          //显示移动位置
+        if (first == null) {
+            currentCanMovePoint = null;
+        } else currentCanMovePoint = first.ChessCanMove(chessComponents, stepNum);
+        for (ChessComponent[] i : chessComponents) {
+            for (ChessComponent j : i) {
                 j.setIfCanMoveOn(false);
             }
         }
-        if (currentCanMovePoint!=null) {
+        if (currentCanMovePoint != null) {
             for (ChessboardPoint i : currentCanMovePoint) {
                 chessComponents[i.getX()][i.getY()].setIfCanMoveOn(true);
             }
@@ -185,6 +198,8 @@ public class Chessboard extends JComponent {
     public void removePassPawn(ChessComponent passPawn) {       //吃过路卒
         remove(passPawn);
         add(passPawn = new EmptySlotComponent(passPawn.getChessboardPoint(), passPawn.getLocation(), clickController, CHESS_SIZE));
+        chessComponents[passPawn.getChessboardPoint().getX()][passPawn.getChessboardPoint().getY()] = passPawn;
+        passPawn.repaint();
     }
 
     public void upGratePawn(ChessComponent upGratePawn) {    //卒升变
@@ -216,6 +231,7 @@ public class Chessboard extends JComponent {
         this.currentColor = currentColor;
         stepNum = step;
         initiateEmptyChessboard();
+        clickController.intiFirst();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 switch (currentChessBoard.charAt(9 * i + j)) {
@@ -322,28 +338,24 @@ public class Chessboard extends JComponent {
         return new Point(col * CHESS_SIZE, row * CHESS_SIZE);
     }
 
-    public void regret(){
-        if(stepNum<=1){
-            JOptionPane.showMessageDialog(null, "初始步骤", "提示",JOptionPane.WARNING_MESSAGE);
-        }else {
-        Integer I=stepNum-1;
-        ChessColor regretColor=null;
-        if(currentColor==ChessColor.WHITE){
-            regretColor=ChessColor.BLACK;
-        }else if (currentColor==ChessColor.BLACK){
-            regretColor=ChessColor.WHITE;
-        }
-        loadCurrentGame(regretColor,map.get(I).subSequence(2,73).toString(),stepNum-1);
+    public void regret() {
+        if (stepNum <= 1) {
+            JOptionPane.showMessageDialog(null, "初始步骤", "提示", JOptionPane.WARNING_MESSAGE);
+        } else {
+            Integer I = stepNum - 1;
+            ChessColor regretColor = null;
+            regretColor= currentColor==ChessColor.WHITE? ChessColor.BLACK:ChessColor.WHITE;
+            loadCurrentGame(regretColor, map.get(I).subSequence(2, 73).toString(), stepNum - 1);
         }
     }
 
     public boolean loadGame(File file) {
         Map<Integer, StringBuilder> map1 = new HashMap<>();
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./resource/save1.txt"))) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             map1 = (Map<Integer, StringBuilder>) ois.readObject();
             System.out.println(map1);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "文件有改动", "提示",JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "文件有改动", "提示", JOptionPane.WARNING_MESSAGE);
             return false;
         }
         StringBuilder sb = new StringBuilder();
@@ -353,21 +365,25 @@ public class Chessboard extends JComponent {
         for (; I <= endStep; I++) {
             System.out.println(I);
             if (!map1.containsKey(I)) {
-                JOptionPane.showMessageDialog(null, "含非法移动", "提示",JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null, "105", "含非法移动", JOptionPane.WARNING_MESSAGE);
                 return false;
             } else {
                 sb = map1.get(I);
                 System.out.println(sb);
-                if (sb.length() != 81) {
-                    JOptionPane.showMessageDialog(null, "棋盘大小非法", "提示",JOptionPane.WARNING_MESSAGE);
+                if (sb.charAt(0) != 'w' && sb.charAt(0) != 'b') {
+                    JOptionPane.showMessageDialog(null, "103", "无行棋方", JOptionPane.WARNING_MESSAGE);
                     return false;
                 }
-                if (sb.charAt(0) != 'w' && sb.charAt(0) != 'b') {
-                    JOptionPane.showMessageDialog(null, "没有当前玩家", "提示",JOptionPane.WARNING_MESSAGE);
+                if (!(sb.charAt(sb.length()-7) == 'S' && sb.charAt(sb.length()-6) == 't' && sb.charAt(sb.length()-5) == 'e' && sb.charAt(sb.length()-4) == 'p' && sb.charAt(sb.length()-3) == ':')) {
+                    JOptionPane.showMessageDialog(null, "106", "缺少当前步", JOptionPane.WARNING_MESSAGE);
                     return false;
                 }
                 if (sb.charAt(1) != '\n') {
-                    JOptionPane.showMessageDialog(null, "格式错误", "提示",JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "101", "棋盘并非8*8", JOptionPane.WARNING_MESSAGE);
+                    return false;
+                }
+                if (sb.length() != 81) {
+                    JOptionPane.showMessageDialog(null, "101", "棋盘并非8*8", JOptionPane.WARNING_MESSAGE);
                     return false;
                 }
                 char[] chessGroup = {'B', 'K', 'N', 'P', 'Q', 'R', '_', 'b', 'k', 'n', 'p', 'q', 'r'};
@@ -378,31 +394,27 @@ public class Chessboard extends JComponent {
                             if (k == sb.charAt(j)) ifIsChess = true;
                         }
                         if (!ifIsChess) {
-                            JOptionPane.showMessageDialog(null, "棋子错误", "提示",JOptionPane.WARNING_MESSAGE);
+                            JOptionPane.showMessageDialog(null, "102", "棋子并非六种之一，棋子并非黑白棋子", JOptionPane.WARNING_MESSAGE);
                             return false;
                         }
                     }
                     if (sb.charAt(i * 9 + 1) != '\n') {
-                        JOptionPane.showMessageDialog(null, "格式错误", "提示",JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "101", "棋盘并非8*8", JOptionPane.WARNING_MESSAGE);
                         return false;
                     }
-                }
-                if (!(sb.charAt(74) == 'S' && sb.charAt(75) == 't' && sb.charAt(76) == 'e' && sb.charAt(77) == 'p' && sb.charAt(78) == ':')) {
-                    JOptionPane.showMessageDialog(null, "格式错误", "提示",JOptionPane.WARNING_MESSAGE);
-                    return false;
                 }
             }
         }
         System.out.println("加载结束");
         ChessColor loadColor = null;
-        if(sb.charAt(0)=='w'){
-            loadColor=ChessColor.WHITE;
-        }else if (sb.charAt(0)=='b'){
-            loadColor=ChessColor.BLACK;
+        if (sb.charAt(0) == 'w') {
+            loadColor = ChessColor.WHITE;
+        } else if (sb.charAt(0) == 'b') {
+            loadColor = ChessColor.BLACK;
         }
-        loadCurrentGame(loadColor, (String) sb.subSequence(2,73),endStep);
-        this.map=map1;
-        JOptionPane.showMessageDialog(null, "加载成功", "提示",JOptionPane.WARNING_MESSAGE);
+        loadCurrentGame(loadColor, (String) sb.subSequence(2, 73), endStep);
+        this.map = map1;
+        JOptionPane.showMessageDialog(null, "加载成功", "提示", JOptionPane.WARNING_MESSAGE);
         return true;
     }
 
@@ -425,9 +437,10 @@ public class Chessboard extends JComponent {
 
     public void saveGame() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("./resource/save1.txt"));
-             ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./resource/save1.txt"))) {
+             ) {
             oos.writeObject(map);
             System.out.println(map);
+            JOptionPane.showMessageDialog(null, "保存成功", "提示", JOptionPane.WARNING_MESSAGE);
         } catch (Exception ignored) {
         }
         /*try {
@@ -453,13 +466,26 @@ public class Chessboard extends JComponent {
     }
 
     public boolean ifKingCanBeEat() {
+        boolean b = false;
         for (ChessComponent[] x : chessComponents) {
             for (ChessComponent y : x) {
                 if (y.getChessColor() != currentColor && y.canEatKing(getStepNum(), chessComponents)) {
-                    return true;
-                }
+                    y.setIfCanEatKing(true);
+                    b = true;
+                } else y.setIfCanEatKing(false);
             }
         }
-        return false;
+        return b;
+    }
+    public void playback(){
+        while (stepNum>1){
+            try {
+                regret();
+                repaint();
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
