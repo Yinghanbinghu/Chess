@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -64,6 +65,8 @@ public class PawnChessComponent extends ChessComponent {
     public PawnChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size) {
         super(chessboardPoint, location, color, listener, size);
         initiatePawnImage(color);
+        if(this.getChessColor()==ChessColor.WHITE) super.setChessName("p");
+        else super.setChessName("P");
     }
 
     /**
@@ -74,9 +77,31 @@ public class PawnChessComponent extends ChessComponent {
      * @return 后棋子移动的合法性
      */
 
+
     @Override
-    public boolean canMoveTo(ChessComponent[][] chessComponents, ChessboardPoint destination,int step) {
-        ChessboardPoint source = getChessboardPoint();
+    public boolean canMoveTo(ChessComponent[][] chessComponents, ChessboardPoint destination, int step) {
+        int row = destination.getX(), col = destination.getY();
+        ArrayList<ChessboardPoint> PawnCanMove = EatPassPawn(chessComponents, step);
+        for (ChessboardPoint TestChessboardPoint : PawnCanMove) {
+            if (TestChessboardPoint.getX() == row && TestChessboardPoint.getY() == col) {
+                if (this.getChessColor() == ChessColor.BLACK)
+                    super.removePassPawn(chessComponents[row - 1][col]);
+                else if (this.getChessColor() == ChessColor.WHITE)
+                    super.removePassPawn(chessComponents[row + 1][col]);
+                return true;
+            }
+        }
+        PawnCanMove = ChessCanMove(chessComponents, step);
+        for (ChessboardPoint TestChessboardPoint : PawnCanMove) {
+            if (TestChessboardPoint.getX() == row && TestChessboardPoint.getY() == col) {
+                if (Math.abs(destination.getX() - this.getChessboardPoint().getX()) == 2) {
+                    this.setTwoStep(step);
+                } else if (destination.getX() == 0 || destination.getX() == 7) super.upGratePawn(1);
+                return true;
+            }
+        }
+        return false;
+        /*ChessboardPoint source = getChessboardPoint();
         System.out.println(step);
         if (this.chessColor == ChessColor.WHITE) {                 //白棋卒
             if (source.getX()==6 &&source.getX() == destination.getX() + 2 && source.getY() == destination.getY() ) {   //第一步前进二
@@ -130,7 +155,7 @@ public class PawnChessComponent extends ChessComponent {
                 }
                 return !(chessComponents[row][col] instanceof EmptySlotComponent);
             } else return false;
-        }
+        }*/
     }
 
     /**
@@ -149,4 +174,45 @@ public class PawnChessComponent extends ChessComponent {
             g.drawOval(0, 0, getWidth(), getHeight());
         }
     }
+
+    @Override
+    public ArrayList<ChessboardPoint> ChessCanMove(ChessComponent[][] chessComponents, int step) {
+        ArrayList<ChessboardPoint> PawnCanMove = new ArrayList<>();
+        if (this.getChessColor() == ChessColor.BLACK) {
+            if (this.getChessboardPoint().getX() == 1 && chessComponents[2][this.getChessboardPoint().getY()].getChessColor() == ChessColor.NONE && chessComponents[3][this.getChessboardPoint().getY()].getChessColor() == ChessColor.NONE)
+                PawnCanMove.add(new ChessboardPoint(3, this.getChessboardPoint().getY()));
+            if (this.getChessboardPoint().getX() + 1 < 8 && chessComponents[this.getChessboardPoint().getX() + 1][this.getChessboardPoint().getY()].getChessColor() == ChessColor.NONE)
+                PawnCanMove.add(new ChessboardPoint(this.getChessboardPoint().getX() + 1, this.getChessboardPoint().getY()));
+            if (this.getChessboardPoint().getX() + 1 < 8 && this.getChessboardPoint().getY() - 1 >= 0 && chessComponents[this.getChessboardPoint().getX() + 1][this.getChessboardPoint().getY() - 1].getChessColor() == ChessColor.WHITE)
+                PawnCanMove.add(new ChessboardPoint(this.getChessboardPoint().getX() + 1, this.getChessboardPoint().getY() - 1));
+            if (this.getChessboardPoint().getX() + 1 < 8 && this.getChessboardPoint().getY() + 1 < 8 && chessComponents[this.getChessboardPoint().getX() + 1][this.getChessboardPoint().getY() + 1].getChessColor() == ChessColor.WHITE)
+                PawnCanMove.add(new ChessboardPoint(this.getChessboardPoint().getX() + 1, this.getChessboardPoint().getY() + 1));
+        } else if (this.getChessColor() == ChessColor.WHITE) {
+            if (this.getChessboardPoint().getX() == 6 && chessComponents[5][this.getChessboardPoint().getY()].getChessColor() == ChessColor.NONE && chessComponents[4][this.getChessboardPoint().getY()].getChessColor() == ChessColor.NONE)
+                PawnCanMove.add(new ChessboardPoint(4, this.getChessboardPoint().getY()));
+            if (this.getChessboardPoint().getX() - 1 >= 0 && chessComponents[this.getChessboardPoint().getX() - 1][this.getChessboardPoint().getY()].getChessColor() == ChessColor.NONE)
+                PawnCanMove.add(new ChessboardPoint(this.getChessboardPoint().getX() - 1, this.getChessboardPoint().getY()));
+            if (this.getChessboardPoint().getX() - 1 >= 0 && this.getChessboardPoint().getY() - 1 >= 0 && chessComponents[this.getChessboardPoint().getX() - 1][this.getChessboardPoint().getY() - 1].getChessColor() == ChessColor.BLACK)
+                PawnCanMove.add(new ChessboardPoint(this.getChessboardPoint().getX() - 1, this.getChessboardPoint().getY() - 1));
+            if (this.getChessboardPoint().getX() - 1 >= 0 && this.getChessboardPoint().getY() + 1 < 8 && chessComponents[this.getChessboardPoint().getX() - 1][this.getChessboardPoint().getY() + 1].getChessColor() == ChessColor.BLACK)
+                PawnCanMove.add(new ChessboardPoint(this.getChessboardPoint().getX() - 1, this.getChessboardPoint().getY() + 1));
+        }
+        PawnCanMove.addAll(EatPassPawn(chessComponents,step));
+        return PawnCanMove;
+    }
+
+    public ArrayList<ChessboardPoint> EatPassPawn(ChessComponent[][] chessComponents, int step) {
+        ArrayList<ChessboardPoint> EatPassPawn = new ArrayList<>();
+        int row = this.getChessboardPoint().getX(), col = this.getChessboardPoint().getY();
+        if (col + 1 <=7 && chessComponents[row][col + 1] instanceof PawnChessComponent && chessComponents[row][col + 1].getChessColor() != this.getChessColor() && chessComponents[row][col + 1].getTwoStep() + 1 == step) {
+            if (this.getChessColor() == ChessColor.BLACK) EatPassPawn.add(new ChessboardPoint(row + 1, col + 1));
+            else if (this.getChessColor() == ChessColor.WHITE) EatPassPawn.add(new ChessboardPoint(row - 1, col + 1));
+        }
+        if (col - 1 >= 0 && chessComponents[row][col - 1] instanceof PawnChessComponent && chessComponents[row][col - 1].getChessColor() != this.getChessColor() && chessComponents[row][col - 1].getTwoStep() + 1 == step) {
+            if (this.getChessColor() == ChessColor.BLACK) EatPassPawn.add(new ChessboardPoint(row + 1, col - 1));
+            else if (this.getChessColor() == ChessColor.WHITE) EatPassPawn.add(new ChessboardPoint(row - 1, col - 1));
+        }
+        return EatPassPawn;
+    }
+
 }

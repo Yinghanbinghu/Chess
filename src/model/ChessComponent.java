@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * 这个类是一个抽象类，主要表示8*8棋盘上每个格子的棋子情况，当前有两个子类继承它，分别是EmptySlotComponent(空棋子)和RookChessComponent(车)。
@@ -23,6 +24,8 @@ public abstract class ChessComponent extends JComponent {
 
 //    private static final Dimension CHESSGRID_SIZE = new Dimension(1080 / 4 * 3 / 8, 1080 / 4 * 3 / 8);
     private static final Color[] BACKGROUND_COLORS = {Color.WHITE, Color.BLACK};
+    private static final Color[] CHOOSE_BACKGROUND_COLORS = {Color.LIGHT_GRAY, Color.CYAN};
+    private static final Color[] EAT_KING_BACKGROUND_COLORS={Color.PINK,Color.RED};
     /**
      * handle click event
      */
@@ -38,8 +41,34 @@ public abstract class ChessComponent extends JComponent {
     private ChessboardPoint chessboardPoint;
     protected final ChessColor chessColor;
     private boolean selected;
+    private String name;
+    private ChessboardPoint intiPoint=null;
 
-    private int twoStep=0;                 //计算可吃过路兵的step
+    private int twoStep=0;                   //计算可吃过路兵的step
+
+    private boolean ifCanMoveOn=false;
+    private boolean ifCanEatKing=false;
+
+    public void setIntiPoint(ChessboardPoint intiPoint) {
+        this.intiPoint = intiPoint;
+    }
+
+    public void setIfCanEatKing(boolean ifCanEatKing) {
+        this.ifCanEatKing = ifCanEatKing;
+    }
+
+    public void setIfCanMoveOn(boolean ifCanMoveOn) {
+        this.ifCanMoveOn = ifCanMoveOn;
+    }
+
+    public String getChessName() {
+        return name;
+    }
+
+
+    public void setChessName(String name) {   //设置棋子名称
+        this.name=name;
+    }
 
     public int getTwoStep(){
         return twoStep;
@@ -70,6 +99,8 @@ public abstract class ChessComponent extends JComponent {
     public ChessboardPoint getChessboardPoint() {
         return chessboardPoint;
     }
+
+    public abstract ArrayList<ChessboardPoint> ChessCanMove(ChessComponent[][] chessComponents,int step);
 
     public void setChessboardPoint(ChessboardPoint chessboardPoint) { this.chessboardPoint = chessboardPoint; }
 
@@ -105,7 +136,6 @@ public abstract class ChessComponent extends JComponent {
     @Override
     protected void processMouseEvent(MouseEvent e) {
         super.processMouseEvent(e);
-
         if (e.getID() == MouseEvent.MOUSE_PRESSED) {
             System.out.printf("Click [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
             clickController.onClick(this);
@@ -131,9 +161,20 @@ public abstract class ChessComponent extends JComponent {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponents(g);
+        Color squareColor;
         System.out.printf("repaint chess [%d,%d]\n", chessboardPoint.getX(), chessboardPoint.getY());
-        Color squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];
+        if(ifCanMoveOn){squareColor = CHOOSE_BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];}
+        else if(ifCanEatKing){squareColor = EAT_KING_BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];}
+        else {squareColor = BACKGROUND_COLORS[(chessboardPoint.getX() + chessboardPoint.getY()) % 2];}
         g.setColor(squareColor);
         g.fillRect(0, 0, this.getWidth(), this.getHeight());
+    }
+
+    public boolean canEatKing(int step, ChessComponent[][] chessComponents) {
+        for (ChessboardPoint i : this.ChessCanMove(chessComponents, step)) {
+            if (chessComponents[i.getX()][i.getY()] instanceof KingChessComponent)
+                return true;
+        }
+        return false;
     }
 }

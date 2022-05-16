@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * 这个类表示国际象棋里面的马
@@ -63,6 +64,8 @@ public class KnightChessComponent extends ChessComponent {
     public KnightChessComponent(ChessboardPoint chessboardPoint, Point location, ChessColor color, ClickController listener, int size) {
         super(chessboardPoint, location, color, listener, size);
         initiateKnightImage(color);
+        if(this.getChessColor()==ChessColor.WHITE) super.setChessName("n");
+        else super.setChessName("N");
     }
 
     /**
@@ -73,14 +76,21 @@ public class KnightChessComponent extends ChessComponent {
      * @return 后棋子移动的合法性
      */
 
+
     @Override
     public boolean canMoveTo(ChessComponent[][] chessComponents, ChessboardPoint destination,int step) {
-        ChessboardPoint source = getChessboardPoint();
+        ArrayList<ChessboardPoint> KnightCanMove=ChessCanMove(chessComponents,step);
+        int row=destination.getX(),col=destination.getY();
+        for (ChessboardPoint TestChessboardPoint:KnightCanMove) {
+            if( TestChessboardPoint.getX() == row && TestChessboardPoint.getY() == col)return true;
+        }
+        return false;
+        /*ChessboardPoint source = getChessboardPoint();
         if ((source.getX() == destination.getX()+1||source.getX() == destination.getX()-1)&&(source.getY() == destination.getY()+2||source.getY() == destination.getY()-2)) {
             return true;
         }else if((source.getX() == destination.getX()+2||source.getX() == destination.getX()-2)&&(source.getY() == destination.getY()+1||source.getY() == destination.getY()-1)){
             return true;
-        }else return false;
+        }else return false;*/
     }
 
     /**
@@ -98,5 +108,29 @@ public class KnightChessComponent extends ChessComponent {
             g.setColor(Color.RED);
             g.drawOval(0, 0, getWidth() , getHeight());
         }
+    }
+
+    public ArrayList<ChessboardPoint> ChessCanMove(ChessComponent[][] chessComponents,int step){
+        ArrayList<ChessboardPoint> KnightCanMove = new ArrayList<>();
+        int col = this.getChessboardPoint().getY();
+        int row = this.getChessboardPoint().getX();
+        int i,j;
+        i=row+2;j=col-1;
+        if(i>=0&&i<8&&j>=0&&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor())KnightCanMove.add(new ChessboardPoint(i,j));
+        i=row+2;j=col+1;
+        if(i>=0&&i<8&&j>=0&&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor())KnightCanMove.add(new ChessboardPoint(i,j));
+        i=row+1;j=col-2;
+        if(i>=0&&i<8&&j>=0&&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor())KnightCanMove.add(new ChessboardPoint(i,j));
+        i=row+1;j=col+2;
+        if(i>=0&&i<8&&j>=0&&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor())KnightCanMove.add(new ChessboardPoint(i,j));
+        i=row-1;j=col-2;
+        if(i>=0&&i<8&&j>=0&&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor())KnightCanMove.add(new ChessboardPoint(i,j));
+        i=row-1;j=col+2;
+        if(i>=0&&i<8&&j>=0&&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor())KnightCanMove.add(new ChessboardPoint(i,j));
+        i=row-2;j=col-1;
+        if(i>=0&&i<8&&j>=0&&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor())KnightCanMove.add(new ChessboardPoint(i,j));
+        i=row-2;j=col+1;
+        if(i>=0&&i<8&&j>=0&&j<8&&chessComponents[i][j].getChessColor()!=this.getChessColor())KnightCanMove.add(new ChessboardPoint(i,j));
+        return KnightCanMove;
     }
 }

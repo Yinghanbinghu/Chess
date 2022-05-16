@@ -4,8 +4,8 @@ import controller.GameController;
 
 import javax.swing.*;
 import java.awt.*;
-
-import java.util.Timer;
+import java.awt.event.WindowEvent;
+import java.io.File;
 
 /**
  * 这个类表示游戏过程中的整个游戏界面，是一切的载体
@@ -34,6 +34,10 @@ public class ChessGameFrame extends JFrame {
         addHelloButton();
         addLoadButton();
         addNewGameButton();
+        addHelpButton();
+        addSaveButton();
+        addRegretButton();
+        addPlaybackButton();
     }
 
 
@@ -69,35 +73,107 @@ public class ChessGameFrame extends JFrame {
      */
 
     private void addHelloButton() {
-        JButton button = new JButton("Show Hello Here");
+        JButton button = new JButton("你好！");
         button.addActionListener((e) -> JOptionPane.showMessageDialog(this, "Hello, world!"));
-        button.setLocation(HEIGTH, HEIGTH / 10 + 120);
+        button.setLocation(HEIGTH, HEIGTH / 10 + 60);
         button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
         add(button);
     }
 
     private void addNewGameButton() {
-        JButton button = new JButton("New Game");
-        button.addActionListener((e) -> addChessboard());
-        button.setLocation(HEIGTH, HEIGTH / 10 + 360);
+        JButton button = new JButton("新游戏");
+        button.addActionListener((e) -> gameController.newGame());
+        button.setLocation(HEIGTH, HEIGTH / 10 + 120);
         button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
         add(button);
     }
 
     private void addLoadButton() {
-        JButton button = new JButton("Load");
-        button.setLocation(HEIGTH, HEIGTH / 10 + 240);
+        JButton button = new JButton("载入");
+        button.setLocation(HEIGTH, HEIGTH / 10 + 180);
         button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
         add(button);
 
         button.addActionListener(e -> {
             System.out.println("Click load");
-            String path = JOptionPane.showInputDialog(this,"Input Path here");
-            gameController.loadGameFromFile(path);
+            JFileChooser jfc=new JFileChooser(new File("./resource"));
+            jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            jfc.showDialog(new JLabel(),"确认");
+            File file;
+            try {
+                file=jfc.getSelectedFile();
+                if(file.getName().endsWith(".txt")) {
+                    if (file!=null) gameController.loadGameFromFile(file);
+                }else {
+                    JOptionPane.showMessageDialog(null,"104","文件格式错误",JOptionPane.ERROR_MESSAGE);
+                }
+            }catch (Exception ignored){}
         });
     }
+    private void addHelpButton(){
+        JButton button = new JButton("帮助模式：开");
 
+        button.addActionListener((e) ->{
+            gameController.setHelpModel();
+            if(gameController.getHelpModel()){button.setText("帮助模式：开");
+            }else button.setText("帮助模式：关");
+        });
+
+        button.setLocation(HEIGTH, HEIGTH / 10 + 240);
+        button.setSize(200, 60);
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
+        add(button);
+    }
+    private void addSaveButton() {
+        JButton button = new JButton("保存");
+        button.setLocation(HEIGTH, HEIGTH / 10 + 360);
+        button.setSize(200, 60);
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
+        add(button);
+
+        button.addActionListener(e -> {
+            System.out.println("Click save");
+            gameController.saveGame();
+        });
+    }
+    private void addRegretButton() {
+        JButton button = new JButton("悔棋");
+        button.setLocation(HEIGTH, HEIGTH / 10 + 300);
+        button.setSize(200, 60);
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
+        add(button);
+
+        button.addActionListener(e -> {
+            System.out.println("Click regret");
+            gameController.regret();
+        });
+    }
+    private void addPlaybackButton() {
+        JButton button = new JButton("回放");
+        button.setLocation(HEIGTH, HEIGTH / 10 + 420);
+        button.setSize(200, 60);
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
+        add(button);
+
+        button.addActionListener(e -> {
+            System.out.println("Click playback");
+            gameController.playback();
+        });
+    }
 }
+
+
+/*class PawnUpGrate extends JFrame{
+    private final int WIDTH;
+    private final int HEIGTH;
+
+    PawnUpGrate(int width, int heigth) {
+        WIDTH = width;
+        HEIGTH = heigth;
+        setSize(WIDTH, HEIGTH);
+    }*/
+
+
