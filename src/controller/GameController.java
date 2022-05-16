@@ -13,7 +13,6 @@ public class GameController {
 
     public GameController(Chessboard chessboard) {
         this.chessboard = chessboard;
-
     }
 
     public void setHelpModel(){

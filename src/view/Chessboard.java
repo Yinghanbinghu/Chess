@@ -1,14 +1,16 @@
 package view;
 
 
-import controller.AIController;
-import controller.GameController;
 import controller.TimeController;
 import model.*;
 import controller.ClickController;
+import web.WebListener;
+import web.WebProxy;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +20,13 @@ import java.util.Map;
 /**
  * 这个类表示面板上的棋盘组件对象
  */
-public class Chessboard extends JComponent {
+public class Chessboard extends JComponent implements WebListener {
+    public static final char INVITE_CONNECT = 'a', ACCEPT_INVITE = 'b', REJECT_ACCEPT = 'c', GET_ACCOUNT = 'd', DISCONNECT = 'e', GAME_ACTION = 'f';
+    private JButton findPlayButton;
+    private WebProxy proxy;
+    public String myID, opponentID;
+    private String action="";
+
     /**
      * CHESSBOARD_SIZE： 棋盘是8 * 8的
      * <br>
@@ -41,16 +49,7 @@ public class Chessboard extends JComponent {
     private int stepNum = 1;      //步数计算
     private Map<Integer, StringBuilder> map = new HashMap<>();
     private ArrayList<ChessboardPoint> currentCanMovePoint = null;
-    private AIController ai=new AIController(this);
 
-    public void randomMove(){
-        ai.setChessboard(this);
-        ai.random(currentColor);
-    }
-
-    public ClickController getClickController() {
-        return clickController;
-    }
 
     private boolean ifHelp = true;
 
@@ -119,7 +118,12 @@ public class Chessboard extends JComponent {
         saveStep();
     }
 
-    public Chessboard(int width, int height) {
+    public Chessboard(int width, int height, JButton button) {
+
+        proxy = new WebProxy(this,"127.0.0.1",8888);
+
+        findPlayButton=button;
+
         setLayout(null); // Use absolute layout.
         setSize(width, height);
         CHESS_SIZE = width / 8;
@@ -128,6 +132,7 @@ public class Chessboard extends JComponent {
         initiateEmptyChessboard();
 
         // FIXME: Initialize chessboard for testing only.
+        setMyButton(findPlayButton);
         if (model == 1) {
             initRookOnBoard(0, 0, ChessColor.BLACK);
             initRookOnBoard(0, CHESSBOARD_SIZE - 1, ChessColor.BLACK);
@@ -207,22 +212,22 @@ public class Chessboard extends JComponent {
         Object[] obj2 = {"后", "车", "马", "相"};
         String s = (String) JOptionPane.showInputDialog(null, "请选择你的升变类型:\n", "兵升变", JOptionPane.WARNING_MESSAGE, new ImageIcon("icon.png"), obj2, "后");
         switch (s) {
-            case "后" -> {
+            case "后" :
                 putChessOnBoard(upGratePawn = new QueenChessComponent(upGratePawn.getChessboardPoint(), upGratePawn.getLocation(), upGratePawn.getChessColor(), clickController, CHESS_SIZE));
                 upGratePawn.repaint();
-            }
-            case "车" -> {
+                break;
+            case "车" :
                 putChessOnBoard(upGratePawn = new RookChessComponent(upGratePawn.getChessboardPoint(), upGratePawn.getLocation(), upGratePawn.getChessColor(), clickController, CHESS_SIZE));
                 upGratePawn.repaint();
-            }
-            case "马" -> {
+                break;
+            case "马" :
                 putChessOnBoard(upGratePawn = new KnightChessComponent(upGratePawn.getChessboardPoint(), upGratePawn.getLocation(), upGratePawn.getChessColor(), clickController, CHESS_SIZE));
                 upGratePawn.repaint();
-            }
-            default -> {
+                break;
+            default :
                 putChessOnBoard(upGratePawn = new BishopChessComponent(upGratePawn.getChessboardPoint(), upGratePawn.getLocation(), upGratePawn.getChessColor(), clickController, CHESS_SIZE));
                 upGratePawn.repaint();
-            }
+                break;
         }
     }
 
@@ -479,13 +484,70 @@ public class Chessboard extends JComponent {
     }
     public void playback(){
         while (stepNum>1){
+            regret();
+            repaint();
             try {
-                regret();
-                repaint();
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void gettingAction(String message) {
+        System.out.println(message);
+        myAction(message.charAt(0), message.substring(1));
+    }
+
+    private void myAction(char flag, String message) {
+        switch (flag){
+            case INVITE_CONNECT:
+                int a = (int)JOptionPane.showConfirmDialog(null,"连接", "有人想要连接你，它的ID是："+ message,1);
+                if(a == 0){
+                    opponentID=message;
+                    proxy.send(message+"#" + ACCEPT_INVITE + myID);
+                }else{
+                    proxy.send(message +"#" + REJECT_ACCEPT);
+                }
+                break;
+            case ACCEPT_INVITE:
+                opponentID = message;
+                JOptionPane.showMessageDialog(null, "连接成功");
+                break;
+            case REJECT_ACCEPT:
+                JOptionPane.showMessageDialog(null, "对方拒绝了您");
+                break;
+            case GET_ACCOUNT:
+                myID = message;
+                break;
+            case DISCONNECT:
+                JOptionPane.showMessageDialog(null,"对手跑了");
+                opponentID = "还没有对手";
+                break;
+            case GAME_ACTION:
+                break;
+        }
+    }
+
+    @Override
+    public void showError() {
+        JOptionPane.showMessageDialog(null,"网络错误！");
+    }
+
+    private void setMyButton(JButton button){
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String str = (String)JOptionPane.showInputDialog(null,"输入对手ID");
+                if(str == null || str.isEmpty())return;
+                try{
+                    int a = Integer.parseInt(str);
+                    proxy.send(str+"#"+INVITE_CONNECT + myID);
+                }catch (NumberFormatException e2){
+                    JOptionPane.showMessageDialog(null,"您的输入不合法");
+                }
+            }
+        });
     }
 }

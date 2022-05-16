@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * 这个类表示国际象棋里面的兵
+ * 这个类表示国际象棋里面的卒
  */
 public class PawnChessComponent extends ChessComponent {
     /**
