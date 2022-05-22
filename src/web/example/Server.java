@@ -1,6 +1,6 @@
 package web.example;
 
-import view.Chessboard;
+import view.WebChessboard;
 import web.CloseUtil;
 import web.WebListener;
 import web.WebProxy;
@@ -19,7 +19,7 @@ public class Server{
         ServerSocket serverSocket = new ServerSocket(8888);
         while(true) {
             Socket clientSocket = serverSocket.accept();//等待客户机连接
-            new DataOutputStream(clientSocket.getOutputStream()).writeUTF(Chessboard.GET_ACCOUNT +"" + cnt);
+            new DataOutputStream(clientSocket.getOutputStream()).writeUTF(WebChessboard.GET_ACCOUNT +"" + cnt);
             Channel channel = new Channel(clientSocket, cnt);
             System.out.println("new comer! "+cnt);
             clientMap.put(cnt++, channel);
@@ -64,7 +64,7 @@ class Channel implements WebListener, Runnable{
         CloseUtil.close(proxy);
         Server.clientMap.remove(myID);
         try {
-            Server.clientMap.get(targetID).proxy.send(Chessboard.DISCONNECT+"");
+            Server.clientMap.get(targetID).proxy.send(WebChessboard.DISCONNECT+"");
         }catch (NullPointerException e){
 
         }

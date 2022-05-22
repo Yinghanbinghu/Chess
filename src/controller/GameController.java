@@ -20,7 +20,7 @@ public class GameController {
     }
 
     public boolean loadGameFromFile(File f) {
-       return chessboard.loadGame(f);
+        return chessboard.loadGame(f);
     }
     public boolean getHelpModel(){
         return chessboard.isIfHelp();
@@ -35,8 +35,6 @@ public class GameController {
     public void regret(){
         chessboard.regret();
     }
-    public void playback(){
-        chessboard.playback();
-    }
+    //public void playback(){chessboard.playback();}
 
 }

@@ -1,6 +1,7 @@
 package view;
 
 import controller.GameController;
+import controller.TimeController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,10 +16,19 @@ public class ChessGameFrame extends JFrame {
     private final int HEIGTH;
     public final int CHESSBOARD_SIZE;
     private GameController gameController;
-    private JButton connectButton;
+    private String style;
+    private MainFrame mainFrame;
+    private Chessboard chessboard;
+    private TimeController time1 =new TimeController(this);
+    JButton playBackButton;
 
-    public ChessGameFrame(int width, int height) {
+    public Chessboard getChessboard() {
+        return chessboard;
+    }
 
+    public ChessGameFrame(int width, int height, String style, MainFrame mainFrame) {
+        this.mainFrame=mainFrame;
+        this.style=style;
         setTitle("2022 CS102A Project Demo"); //设置标题
         this.WIDTH = width;
         this.HEIGTH = height;
@@ -28,16 +38,20 @@ public class ChessGameFrame extends JFrame {
         setLocationRelativeTo(null); // Center the window.
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE); //设置程序关闭按键，如果点击右上方的叉就游戏全部关闭了
         setLayout(null);
-        addConnectButton();
-        addHelloButton();
+
+
+        addPlaybackButton();
         addChessboard();
+        addTimer();
         addLabel();
+        addHelloButton();
         addLoadButton();
         addNewGameButton();
         addHelpButton();
         addSaveButton();
         addRegretButton();
-        addPlaybackButton();
+        addQuitButton();
+        addBackGround();
     }
 
 
@@ -45,25 +59,45 @@ public class ChessGameFrame extends JFrame {
      * 在游戏面板中添加棋盘
      */
     private void addChessboard() {
-        Chessboard chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE, connectButton);
+        chessboard = new Chessboard(CHESSBOARD_SIZE, CHESSBOARD_SIZE, time1, playBackButton);
         gameController = new GameController(chessboard);
         chessboard.setLocation(HEIGTH / 10, HEIGTH / 10);
         add(chessboard);
+    }
+
+    private void addBackGround(){
+        Icon backgroundIcon=new ImageIcon();
+        switch (style){
+            case "四月":backgroundIcon=new ImageIcon("./images/siyuechessboard.png");
+                break;
+            case "碧蓝":backgroundIcon=new ImageIcon("./images/bilanchessboard.png");
+                break;
+        }
+        //Image im=new Image(icon);
+        //将图片放入label中
+        JLabel backgroundLabel=new JLabel(backgroundIcon);
+        backgroundLabel.setBounds(0,0,backgroundIcon.getIconWidth(),backgroundIcon.getIconHeight());
+//        getLayeredPane().add(label,-100);
+        add(backgroundLabel);
     }
 
     /**
      * 在游戏面板中添加标签
      */
     private void addLabel() {
-        JLabel statusLabel = new JLabel("Sample label");
-        statusLabel.setLocation(HEIGTH, HEIGTH / 10);
+        JLabel statusLabel = new JLabel("2022 CS102A Project");
+        statusLabel.setLocation(HEIGTH, HEIGTH / 10-60);
         statusLabel.setSize(200, 60);
-        statusLabel.setFont(new Font("Rockwell", Font.BOLD, 20));
+        statusLabel.setFont(new Font("Rockwell", Font.BOLD, 15));
         add(statusLabel);
     }
 
     private void addTimer(){
-
+        time1.setShow(true);
+        JLabel label= time1.getShowTime();
+        label.setLocation(HEIGTH, HEIGTH / 10);
+        label.setSize(200, 60);
+        add(label);
     }
 
 
@@ -73,35 +107,28 @@ public class ChessGameFrame extends JFrame {
      */
 
     private void addHelloButton() {
-        JButton button = new JButton("Show Hello Here");
-        button.setLocation(HEIGTH, HEIGTH / 10 + 120);
+        JButton button = new JButton("你好！");
+        button.addActionListener((e) -> JOptionPane.showMessageDialog(this, "Hello, world!"));
+        button.setLocation(HEIGTH, HEIGTH / 10 + 60);
         button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
         add(button);
     }
 
-    private void addConnectButton() {
-        connectButton = new JButton("connect");
-        connectButton.setLocation(HEIGTH, HEIGTH / 10 + 120);
-        connectButton.setSize(200, 60);
-        connectButton.setFont(new Font("Rockwell", Font.BOLD, 20));
-        add(connectButton);
-    }
-
     private void addNewGameButton() {
-        JButton button = new JButton("New Game");
+        JButton button = new JButton("新游戏");
         button.addActionListener((e) -> gameController.newGame());
         button.setLocation(HEIGTH, HEIGTH / 10 + 120);
         button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
         add(button);
     }
 
     private void addLoadButton() {
-        JButton button = new JButton("Load");
+        JButton button = new JButton("载入");
         button.setLocation(HEIGTH, HEIGTH / 10 + 180);
         button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
         add(button);
 
         button.addActionListener(e -> {
@@ -121,24 +148,24 @@ public class ChessGameFrame extends JFrame {
         });
     }
     private void addHelpButton(){
-        JButton button = new JButton("Help On");
+        JButton button = new JButton("帮助模式：开");
 
         button.addActionListener((e) ->{
             gameController.setHelpModel();
-            if(gameController.getHelpModel()){button.setText("Help On");
-            }else button.setText("Help Off");
+            if(gameController.getHelpModel()){button.setText("帮助模式：开");
+            }else button.setText("帮助模式：关");
         });
 
         button.setLocation(HEIGTH, HEIGTH / 10 + 240);
         button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
         add(button);
     }
     private void addSaveButton() {
-        JButton button = new JButton("Save");
+        JButton button = new JButton("保存");
         button.setLocation(HEIGTH, HEIGTH / 10 + 360);
         button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
         add(button);
 
         button.addActionListener(e -> {
@@ -147,10 +174,10 @@ public class ChessGameFrame extends JFrame {
         });
     }
     private void addRegretButton() {
-        JButton button = new JButton("Regret");
+        JButton button = new JButton("悔棋");
         button.setLocation(HEIGTH, HEIGTH / 10 + 300);
         button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
         add(button);
 
         button.addActionListener(e -> {
@@ -159,15 +186,28 @@ public class ChessGameFrame extends JFrame {
         });
     }
     private void addPlaybackButton() {
-        JButton button = new JButton("Playback");
-        button.setLocation(HEIGTH, HEIGTH / 10 + 420);
+        playBackButton = new JButton("回放");
+        playBackButton.setLocation(HEIGTH, HEIGTH / 10 + 420);
+        playBackButton.setSize(200, 60);
+        playBackButton.setFont(new Font("方正舒体", Font.BOLD, 20));
+        add(playBackButton);
+
+        playBackButton.addActionListener(e -> {
+            System.out.println("Click playback");
+        });
+    }
+    private void addQuitButton() {
+        JButton button = new JButton("退出");
+        button.setLocation(HEIGTH, HEIGTH / 10 + 480);
         button.setSize(200, 60);
-        button.setFont(new Font("Rockwell", Font.BOLD, 20));
+        button.setFont(new Font("方正舒体", Font.BOLD, 20));
         add(button);
 
         button.addActionListener(e -> {
-            System.out.println("Click playback");
-            gameController.playback();
+            System.out.println("Click quit");
+            this.setVisible(false);
+            mainFrame.setVisible(true);
+            time1.setShow(false);
         });
     }
 }

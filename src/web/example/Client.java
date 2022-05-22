@@ -9,14 +9,14 @@ public class Client implements WebListener {
 
     public static void main(String[] args) throws InterruptedException {
         Client c1 = new Client(1);
-        Thread.sleep(1000);
+        Thread.sleep(20);
     }
 
     WebProxy webProxy;
     int testID;
     public Client(int testID) {
         this.testID = testID;
-        webProxy = new WebProxy(this, "127.0.0.1", 8888);
+        webProxy = new WebProxy(this, "103.46.128.49", 37856);
     }
 
     @Override

@@ -23,9 +23,9 @@ public abstract class ChessComponent extends JComponent {
      */
 
 //    private static final Dimension CHESSGRID_SIZE = new Dimension(1080 / 4 * 3 / 8, 1080 / 4 * 3 / 8);
-    private static final Color[] BACKGROUND_COLORS = {Color.WHITE, Color.BLACK};
-    private static final Color[] CHOOSE_BACKGROUND_COLORS = {Color.LIGHT_GRAY, Color.CYAN};
-    private static final Color[] EAT_KING_BACKGROUND_COLORS={Color.PINK,Color.RED};
+    private static final Color[] BACKGROUND_COLORS = {new Color(255, 255, 255,90),new Color(0,0,0,90)};
+    private static final Color[] CHOOSE_BACKGROUND_COLORS = {new Color(153, 255, 153,90), new Color(130, 255, 255,90)};
+    private static final Color[] EAT_KING_BACKGROUND_COLORS={new Color(255, 51, 153,90),new Color(255, 0, 51,90)};
     /**
      * handle click event
      */

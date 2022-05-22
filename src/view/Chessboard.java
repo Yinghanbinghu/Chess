@@ -1,11 +1,7 @@
 package view;
-
-
 import controller.TimeController;
 import model.*;
 import controller.ClickController;
-import web.WebListener;
-import web.WebProxy;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,13 +16,7 @@ import java.util.Map;
 /**
  * 这个类表示面板上的棋盘组件对象
  */
-public class Chessboard extends JComponent implements WebListener {
-    public static final char INVITE_CONNECT = 'a', ACCEPT_INVITE = 'b', REJECT_ACCEPT = 'c', GET_ACCOUNT = 'd', DISCONNECT = 'e', GAME_ACTION = 'f';
-    private JButton findPlayButton;
-    private WebProxy proxy;
-    public String myID, opponentID;
-    private String action="";
-
+public class Chessboard extends JComponent {
     /**
      * CHESSBOARD_SIZE： 棋盘是8 * 8的
      * <br>
@@ -40,6 +30,10 @@ public class Chessboard extends JComponent implements WebListener {
      */
     private static final int CHESSBOARD_SIZE = 8;
     private static int model = 1;
+    private TimeController time;
+    private JButton playBackButton;
+    private boolean isOver=true;
+    private ArrayList<String> playBackList=new ArrayList<>();
 
     private final ChessComponent[][] chessComponents = new ChessComponent[CHESSBOARD_SIZE][CHESSBOARD_SIZE];
     private ChessColor currentColor = ChessColor.WHITE;
@@ -50,6 +44,9 @@ public class Chessboard extends JComponent implements WebListener {
     private Map<Integer, StringBuilder> map = new HashMap<>();
     private ArrayList<ChessboardPoint> currentCanMovePoint = null;
 
+    public ClickController getClickController() {
+        return clickController;
+    }
 
     private boolean ifHelp = true;
 
@@ -118,12 +115,9 @@ public class Chessboard extends JComponent implements WebListener {
         saveStep();
     }
 
-    public Chessboard(int width, int height, JButton button) {
-
-        proxy = new WebProxy(this,"127.0.0.1",8888);
-
-        findPlayButton=button;
-
+    public Chessboard(int width, int height, TimeController time, JButton playBackButton) {
+        this.time=time;
+        this.playBackButton=playBackButton;
         setLayout(null); // Use absolute layout.
         setSize(width, height);
         CHESS_SIZE = width / 8;
@@ -131,8 +125,9 @@ public class Chessboard extends JComponent implements WebListener {
 
         initiateEmptyChessboard();
 
+        setMyPlayBackButton(this.playBackButton);
+
         // FIXME: Initialize chessboard for testing only.
-        setMyButton(findPlayButton);
         if (model == 1) {
             initRookOnBoard(0, 0, ChessColor.BLACK);
             initRookOnBoard(0, CHESSBOARD_SIZE - 1, ChessColor.BLACK);
@@ -212,19 +207,19 @@ public class Chessboard extends JComponent implements WebListener {
         Object[] obj2 = {"后", "车", "马", "相"};
         String s = (String) JOptionPane.showInputDialog(null, "请选择你的升变类型:\n", "兵升变", JOptionPane.WARNING_MESSAGE, new ImageIcon("icon.png"), obj2, "后");
         switch (s) {
-            case "后" :
+            case "后":
                 putChessOnBoard(upGratePawn = new QueenChessComponent(upGratePawn.getChessboardPoint(), upGratePawn.getLocation(), upGratePawn.getChessColor(), clickController, CHESS_SIZE));
                 upGratePawn.repaint();
                 break;
-            case "车" :
+            case "车":
                 putChessOnBoard(upGratePawn = new RookChessComponent(upGratePawn.getChessboardPoint(), upGratePawn.getLocation(), upGratePawn.getChessColor(), clickController, CHESS_SIZE));
                 upGratePawn.repaint();
                 break;
-            case "马" :
+            case "马":
                 putChessOnBoard(upGratePawn = new KnightChessComponent(upGratePawn.getChessboardPoint(), upGratePawn.getLocation(), upGratePawn.getChessColor(), clickController, CHESS_SIZE));
                 upGratePawn.repaint();
                 break;
-            default :
+            default:
                 putChessOnBoard(upGratePawn = new BishopChessComponent(upGratePawn.getChessboardPoint(), upGratePawn.getLocation(), upGratePawn.getChessColor(), clickController, CHESS_SIZE));
                 upGratePawn.repaint();
                 break;
@@ -293,6 +288,7 @@ public class Chessboard extends JComponent implements WebListener {
 
     public void swapColor() {
         currentColor = currentColor == ChessColor.BLACK ? ChessColor.WHITE : ChessColor.BLACK;
+        time.restart();
     }
 
     private void initRookOnBoard(int row, int col, ChessColor color) {
@@ -352,6 +348,7 @@ public class Chessboard extends JComponent implements WebListener {
             regretColor= currentColor==ChessColor.WHITE? ChessColor.BLACK:ChessColor.WHITE;
             loadCurrentGame(regretColor, map.get(I).subSequence(2, 73).toString(), stepNum - 1);
         }
+        time.restart();
     }
 
     public boolean loadGame(File file) {
@@ -427,7 +424,11 @@ public class Chessboard extends JComponent implements WebListener {
         StringBuilder sb = new StringBuilder();
         if (currentColor == ChessColor.WHITE) {
             sb.append("w" + "\n");
-        } else sb.append("b" + "\n");
+            playBackList.add("w");
+        } else {
+            sb.append("b" + "\n");
+            playBackList.add("b");
+        }
         for (ChessComponent[] i : chessComponents) {
             for (ChessComponent j : i) {
                 sb.append(j.getChessName());
@@ -436,13 +437,14 @@ public class Chessboard extends JComponent implements WebListener {
         }
         sb.append("Step:" + stepNum + "\n");
         map.put(this.stepNum, sb);
+        playBackList.add(sb.toString());
         System.out.println(sb);
     }
 
 
     public void saveGame() {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("./resource/save1.txt"));
-             ) {
+        ) {
             oos.writeObject(map);
             System.out.println(map);
             JOptionPane.showMessageDialog(null, "保存成功", "提示", JOptionPane.WARNING_MESSAGE);
@@ -482,70 +484,28 @@ public class Chessboard extends JComponent implements WebListener {
         }
         return b;
     }
-    public void playback(){
-        while (stepNum>1){
-            regret();
-            repaint();
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
-    @Override
-    public void gettingAction(String message) {
-        System.out.println(message);
-        myAction(message.charAt(0), message.substring(1));
-    }
-
-    private void myAction(char flag, String message) {
-        switch (flag){
-            case INVITE_CONNECT:
-                int a = (int)JOptionPane.showConfirmDialog(null,"连接", "有人想要连接你，它的ID是："+ message,1);
-                if(a == 0){
-                    opponentID=message;
-                    proxy.send(message+"#" + ACCEPT_INVITE + myID);
-                }else{
-                    proxy.send(message +"#" + REJECT_ACCEPT);
-                }
-                break;
-            case ACCEPT_INVITE:
-                opponentID = message;
-                JOptionPane.showMessageDialog(null, "连接成功");
-                break;
-            case REJECT_ACCEPT:
-                JOptionPane.showMessageDialog(null, "对方拒绝了您");
-                break;
-            case GET_ACCOUNT:
-                myID = message;
-                break;
-            case DISCONNECT:
-                JOptionPane.showMessageDialog(null,"对手跑了");
-                opponentID = "还没有对手";
-                break;
-            case GAME_ACTION:
-                break;
-        }
-    }
-
-    @Override
-    public void showError() {
-        JOptionPane.showMessageDialog(null,"网络错误！");
-    }
-
-    private void setMyButton(JButton button){
+    public void setMyPlayBackButton(JButton button){
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String str = (String)JOptionPane.showInputDialog(null,"输入对手ID");
-                if(str == null || str.isEmpty())return;
-                try{
-                    int a = Integer.parseInt(str);
-                    proxy.send(str+"#"+INVITE_CONNECT + myID);
-                }catch (NumberFormatException e2){
-                    JOptionPane.showMessageDialog(null,"您的输入不合法");
+                time.setShow(false);
+                if (false) {
+                    return;
+                }
+                for (int i = 1; i <= (playBackList.size()) / 2; i = i + 2) {
+                    ChessColor temp;
+                    if (playBackList.get(i - 1).equals("w")) {
+                        temp = ChessColor.WHITE;
+                    } else {
+                        temp = ChessColor.BLACK;
+                    }
+                    loadCurrentGame(temp, playBackList.get(i), (i + 1) / 2);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
         });

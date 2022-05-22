@@ -50,8 +50,9 @@ public class ClickController {
                     }else {
                         n = JOptionPane.showConfirmDialog(null, "是否开始新游戏?", "黑方获胜", JOptionPane.YES_NO_OPTION);
                     }
-                    if(n==1) {
+                    if(n==0) {
                         chessboard.initChessboard();
+                        chessboard.repaint();
                     }
                 }
                 //repaint in swap chess method.
@@ -65,7 +66,7 @@ public class ClickController {
                 }
                 if(!chessboard.canMove()){
                     int n = JOptionPane.showConfirmDialog(null, "是否开始新游戏?", "无子可动和棋",JOptionPane.YES_NO_OPTION);
-                    if(n==1){
+                    if(n==0){
                         chessboard.initChessboard();
                     }
                 }
@@ -74,11 +75,12 @@ public class ClickController {
                 first = null;
                 if(chessboard.isIfHelp()&&chessboard.ifKingCanBeEat()){
                     if(chessboard.getCurrentColor()== ChessColor.WHITE)
-                    JOptionPane.showMessageDialog(null, "黑方将军", "提示",JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "黑方将军", "提示",JOptionPane.WARNING_MESSAGE);
                     if(chessboard.getCurrentColor()== ChessColor.BLACK)
                         JOptionPane.showMessageDialog(null, "白方将军", "提示",JOptionPane.WARNING_MESSAGE);
                 }
             }
+            /*chessboard.randomMove();*/
         }
     }
 
